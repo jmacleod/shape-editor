@@ -1,8 +1,8 @@
-import React, { useRef, useEffect, useContext, useCallback, useState } from 'react'
+import React, { useRef, useEffect, useContext, useState } from 'react'
 import { detectedSelectedShapeIndex, draw } from './drawing'
-import { ShapeContext } from './shapeContext';
-import { ActionType, Shape } from './types';
-
+import { StateContext } from './state/StateContext';
+import { CanvasContainer } from './styled-components/CanvasContainer';
+import { ActionType, AnyShape } from './types';
 
 type Props = {
     height: string;
@@ -12,7 +12,7 @@ type Props = {
 
 export const Canvas = (props: Props) => {
 
-    const { state, dispatch } = useContext(ShapeContext);
+    const { state, dispatch } = useContext(StateContext);
     const canvasRef = useRef<HTMLCanvasElement>(null)
 
     const [isMouseDown, setIsMouseDown] = useState(false)
@@ -38,8 +38,8 @@ export const Canvas = (props: Props) => {
 
         const deltaX = x - startMoveCoordinates.x
         const deltaY = y - startMoveCoordinates.y
-        const updatedShapes = state.shapes
-            .map((shape: Shape) => {
+        const updatedShapes: AnyShape[] = state.shapes
+            .map((shape: AnyShape) => {
                 if (shape.selected) {
                     shape.x = (shape.preMoveX || shape.x) + deltaX
                     shape.y = (shape.preMoveY || shape.y) + deltaY
@@ -48,30 +48,22 @@ export const Canvas = (props: Props) => {
             })
 
         dispatch({ type: ActionType.UpdateShapes, shapes: updatedShapes })
-
-
     }
 
     const handleMouseDown = (event: React.MouseEvent) => {
         const bound = canvasRef.current?.getBoundingClientRect()
         const x = event.clientX - (bound?.left || 0) - (canvasRef.current?.clientLeft || 0)
         const y = event.clientY - (bound?.top || 0) - (canvasRef.current?.clientTop || 0)
-        console.log("MOUSE DOWN: ", x, " : ", y)
         setIsMouseDown(true)
         setStartMoveCoordinates({ x, y })
 
-        // detect if we are on a shape
-        // add to selected shapes if multiselect active, otherwise replace selected shaes
-        // if not on a shape, clear selected shapes
         const selectedShapeIndex = detectedSelectedShapeIndex(x, y, state.shapes)
-        console.log("SELECTED SHAPE INDEX: ", selectedShapeIndex)
 
         if (selectedShapeIndex === -1) {  // findIndex returns -1 if it doesn't find it
             // we clicked somewhere not on a shape
             dispatch({ type: ActionType.UnselectAllShapes })
         } else {
             dispatch({ type: ActionType.SelectShapeByIndex, selectedShapeIndex, multiSelect: props.isMultiSelectActive })
-
         }
     }
 
@@ -97,11 +89,8 @@ export const Canvas = (props: Props) => {
         }
     }, [state])
 
-
-    const color = props.isMultiSelectActive ? "Red" : "Blue"
-
     return (
-        <div style={{borderStyle: 'solid', flex:1}}>
+        <CanvasContainer>
             <canvas
                 ref={canvasRef}
                 onMouseDown={(event) => handleMouseDown(event)}
@@ -110,7 +99,7 @@ export const Canvas = (props: Props) => {
                 width={props.width}
                 height={props.height}
             />
-        </div>
+        </CanvasContainer>
     )
 }
 

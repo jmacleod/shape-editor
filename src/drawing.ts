@@ -1,4 +1,3 @@
-import { Cipher } from "crypto"
 import { HIGHLIGHT_COLOR, SELECTION_COLOR } from "./constants"
 import { Circle, Rectangle, Shape, ShapeType } from "./types"
 
@@ -59,10 +58,10 @@ export const draw = (ctx: CanvasRenderingContext2D, shapes: Shape[]) => {
     shapes.forEach((shape: Shape) => {
         switch (shape.type) {
             case ShapeType.CIRCLE:
-                drawCircle(ctx, <Circle>shape)
+                drawCircle(ctx, shape as Circle)
                 break;
             case ShapeType.RECTANGLE:
-                drawRectangle(ctx, <Rectangle>shape)
+                drawRectangle(ctx, shape as Rectangle)
                 break;
             default:
                 throw new Error("Unknown Shape Type");
@@ -75,9 +74,9 @@ export const detectedSelectedShapeIndex = (x: number, y: number, shapes: Shape[]
     return shapes.findIndex((shape: Shape) => {
         switch (shape.type) {
             case ShapeType.CIRCLE:
-                return isWithinCircle(x, y, <Circle>shape)
+                return isWithinCircle(x, y, shape as Circle)
             case ShapeType.RECTANGLE:
-                return isWithinRectangle(x, y, <Rectangle>shape)
+                return isWithinRectangle(x, y, shape as Rectangle)
             default:
                 throw new Error("Unknown Shape Type");
         }
