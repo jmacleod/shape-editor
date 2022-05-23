@@ -15,7 +15,7 @@ const shapeCenter = (shape: Shape): { x: number, y: number } => {
     }
     if (shape.type === ShapeType.RECTANGLE) {
         // We store the upper left corner of the rectangle 
-        // so we have to offset by 1/2 the retangle dimensions to get the center
+        // so we have to offset by 1/2 the rectangle dimensions to get the center
         return {
             x: Math.floor(shape.x + ((shape as Rectangle).width / 2)),
             y: Math.floor(shape.y + ((shape as Rectangle).height / 2)),
